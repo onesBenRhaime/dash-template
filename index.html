@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FleetFlow AI · AI agents that ask before they act</title>
+  <meta name="description" content="FleetFlow AI runs dispatch, routes, exceptions, customers, fleet and reporting with six AI agents. You set how much each one can do alone, test policies on last week's loads, and pause everything with one switch.">
+  <meta property="og:title" content="FleetFlow AI · AI agents that ask before they act">
+  <meta property="og:description" content="1,912 actions a day. 94% with no human needed. Every decision explained, every risky one approved.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230e0e10'/%3E%3Cpath d='M7 18V10a3 3 0 0 1 3-3h7M10 18v-4a2 2 0 0 1 2-2h5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#" class="brand"><span class="mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 19V9a4 4 0 0 1 4-4h10"/><path d="M9 19v-6a2 2 0 0 1 2-2h8"/><circle cx="17" cy="17" r="2"/></svg></span>FleetFlow AI</a>
+    <nav class="links">
+      <a href="#agents">Agents</a>
+      <a href="#control">Control</a>
+      <a href="#sandbox">Sandbox</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="cta">
+      <a class="btn sm" href="app/">Open the product</a>
+      <a class="btn sm dark" href="#demo">Book a demo</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="badge"><b>New</b> Policy sandbox: replay last week before you go live</span>
+      <h1>AI agents that ask <em>before</em> they act.</h1>
+      <p class="lede">FleetFlow AI is a logistics CRM run by six AI agents covering dispatch, routes, exceptions, customers, fleet and reporting. You decide how much each one can do on its own.</p>
+      <div class="ctas">
+        <a class="btn dark" href="#demo">Book a demo</a>
+        <a class="btn" href="app/">Try the live product →</a>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="frame" id="frame">
+        <div class="bar"><i></i><i></i><i></i><span>app.fleetflow.ai/agents</span></div>
+        <iframe src="app/?embed=1#/agents" title="FleetFlow AI live product" loading="lazy"></iframe>
+      </div>
+      <p class="frame-note">This is the real interface. Click around: open an agent, run the sandbox or pause the fleet.</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="logos reveal">
+      Trusted by carriers and 3PLs moving 40,000+ loads a month
+      <div class="row"><span>Northline</span><span>Bayfreight</span><span>Coastal 3PL</span><span>Redwood Haul</span><span>Meridian</span><span>Harbor &amp; Co</span></div>
+    </div>
+
+    <div class="numbers reveal">
+      <div><b>1,912</b><span>agent actions on a typical day</span></div>
+      <div><b>94%</b><span>completed with no human needed</span></div>
+      <div><b>38h</b><span>of dispatcher time saved daily</span></div>
+      <div><b>0</b><span>hours-of-service breaks in sandbox or live</span></div>
+    </div>
+
+    <!-- Agents -->
+    <section class="block" id="agents">
+      <div class="reveal">
+        <div class="eyebrow">Six agents, one fleet</div>
+        <h2>A specialist for every desk in your ops room.</h2>
+        <p class="section-lede">Each agent owns one job, explains every decision in plain English, and hands anything risky to the person you name.</p>
+      </div>
+      <div class="agents" id="agent-grid"></div>
+    </section>
+
+    <!-- Autonomy -->
+    <section class="block" id="control">
+      <div class="feature">
+        <div class="reveal">
+          <div class="eyebrow">You set the dial</div>
+          <h2>Five levels of autonomy, set per capability.</h2>
+          <p class="section-lede">Let the Customer Agent send routine ETAs on its own and make it ask before rebooking a delivery. Every action above Draft is logged with its reason, data and approver.</p>
+          <ul>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 4.5 4.5L19 7"/></svg>Named approvers with backups for each action type</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 4.5 4.5L19 7"/></svg>Guardrails agents can never cross: hours of service, customer windows, spend caps</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 4.5 4.5L19 7"/></svg>Agent pages can only lower org-wide limits, never raise them</li>
+          </ul>
+        </div>
+        <div class="panel reveal">
+          <div class="mini-label">Dispatch Agent · autonomy</div>
+          <div class="dial" id="dial"></div>
+          <div class="dial-out" id="dial-out"></div>
+          <div class="dial-desc" id="dial-desc"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sandbox -->
+    <section class="block" id="sandbox">
+      <div class="feature flip">
+        <div class="reveal">
+          <div class="eyebrow">Policy sandbox</div>
+          <h2>Test a new policy on last week’s real loads.</h2>
+          <p class="section-lede">Before a change goes live, FleetFlow replays it against your actual history and shows exactly which decisions would change, and what that does to on-time, empty miles and approvals.</p>
+          <ul>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 4.5 4.5L19 7"/></svg>Nothing reaches drivers or customers</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 4.5 4.5L19 7"/></svg>Compare against any live policy version</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 4.5 4.5L19 7"/></svg>Publish with one click, with a full audit trail</li>
+          </ul>
+        </div>
+        <div class="panel reveal" id="sb">
+          <div class="sb-head"><div><div class="mini-label">Sep 26 to Oct 2 · 1,412 loads</div><h4>Sandbox results</h4></div><a class="btn sm dark" href="app/#/agents/dispatch">Run it yourself</a></div>
+          <div class="progress"><i></i></div>
+          <div class="sb-stats">
+            <div><span class="mini-label">On time</span><b>96.8%</b><small>+2.6 pts</small></div>
+            <div><span class="mini-label">Empty mi</span><b>−4.1%</b><small>312 fewer</small></div>
+            <div><span class="mini-label">Approvals</span><b>38</b><small>7 fewer</small></div>
+            <div><span class="mini-label">Rule breaks</span><b>0</b><small>All held</small></div>
+          </div>
+          <div class="sb-row"><code>SF-48077</code>Relay at Stockton instead of paying overtime<span class="st auto">Saves $210</span></div>
+          <div class="sb-row"><code>SF-48092</code>Gave the load to Luis, 8 mi closer to pickup<span class="st auto">−8 mi</span></div>
+          <div class="sb-row"><code>SF-48131</code>Wanted an 18 mi detour, blocked by your 15 mi limit<span class="st draft">Blocked</span></div>
+          <div class="sb-row"><code>SF-48160</code>Left 20 min earlier to beat I-80 traffic<span class="st auto">On time</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pause -->
+    <section class="block" id="pause">
+      <div class="feature">
+        <div class="reveal">
+          <div class="eyebrow">One switch</div>
+          <h2>Pause every agent at once when something looks wrong.</h2>
+          <p class="section-lede">Agents stop acting immediately. Queued actions move to a person’s inbox, anything already sent stays sent, and the pause is logged with your reason. Resume whenever you’re ready.</p>
+        </div>
+        <div class="panel dark kill reveal" id="kill">
+          <button class="big" id="kill-btn" aria-label="Pause all agents" aria-pressed="false">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor" id="kill-ic"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </button>
+          <div class="status" id="kill-status">All agents running</div>
+          <div class="sub" id="kill-sub">Tap to pause the whole fleet</div>
+          <div class="agents-row"><span>Dispatch</span><span>Route</span><span>Exception</span><span>Customer</span><span>Fleet</span><span>Analyst</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Audit -->
+    <section class="block">
+      <div class="reveal">
+        <div class="eyebrow">Activity log</div>
+        <h2>Every action, with its reason and who said yes.</h2>
+        <p class="section-lede">Filter by agent, decision or outcome, and export to CSV for your auditors or your customers.</p>
+      </div>
+      <div class="audit reveal">
+        <div class="r"><span>Time</span><span>Agent</span><span>Action and reason</span><span>Approval</span></div>
+        <div class="r"><span class="t">10:42</span><span class="a">Exception Agent</span><span>Proposed reshipping for SF-48613: 3 pallets short on delivery</span><span>Waiting for Priya</span></div>
+        <div class="r"><span class="t">10:27</span><span class="a">Dispatch Agent</span><span>Proposed reassignment: Emily is 42 min from HOS limit</span><span>Waiting for James</span></div>
+        <div class="r"><span class="t">10:22</span><span class="a">Customer Agent</span><span>Sent ETA update: window unchanged, routine at 50% of route</span><span>Auto · policy C-2</span></div>
+        <div class="r"><span class="t">10:09</span><span class="a">Dispatch Agent</span><span>Reassigned SF-48277: Tyler 12 min closer, 3 h HOS left</span><span>Approved by James</span></div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="block" id="pricing">
+      <div class="reveal">
+        <div class="eyebrow">Pricing</div>
+        <h2>Priced per truck, not per action.</h2>
+        <p class="section-lede">Every plan includes all six agents, the sandbox and the global pause. Start in Observe mode and turn up autonomy when you trust it.</p>
+      </div>
+      <div class="plans reveal">
+        <div class="plan">
+          <h3>Starter</h3><div class="price">$29<small> / truck / mo</small></div><p>For fleets up to 25 trucks.</p>
+          <ul><li>✓ All six agents</li><li>✓ Observe, Recommend and Draft</li><li>✓ 30-day activity log</li><li>✓ TMS and ELD integrations</li></ul>
+          <a class="btn" href="#demo">Start free trial</a>
+        </div>
+        <div class="plan featured">
+          <h3>Growth</h3><div class="price">$59<small> / truck / mo</small></div><p>For carriers and 3PLs scaling ops.</p>
+          <ul><li>✓ Everything in Starter</li><li>✓ Approve first and Autonomous</li><li>✓ Policy sandbox on real history</li><li>✓ Named approvers and backups</li><li>✓ 1-year audit trail and CSV export</li></ul>
+          <a class="btn" href="#demo">Book a demo</a>
+        </div>
+        <div class="plan">
+          <h3>Enterprise</h3><div class="price">Custom</div><p>For networks over 500 trucks.</p>
+          <ul><li>✓ Everything in Growth</li><li>✓ SSO, SCIM and custom roles</li><li>✓ Private model deployment</li><li>✓ Unlimited audit retention</li><li>✓ Dedicated success engineer</li></ul>
+          <a class="btn" href="#demo">Talk to sales</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="block" id="faq">
+      <div class="reveal"><div class="eyebrow">FAQ</div><h2>Questions ops leaders ask first.</h2></div>
+      <div class="faq reveal">
+        <details open><summary>What happens if an agent makes a bad call?</summary><p>Anything above Draft is logged with its reason, the data it used and who approved it. You can override any decision, and overrides with reasons teach the agent. If something looks systematically wrong, pause one agent or all of them in one click.</p></details>
+        <details><summary>Can agents break hours-of-service or customer windows?</summary><p>No. Guardrails are hard limits enforced outside the model. An agent can propose crossing one, but the action is blocked and routed to a person, exactly as you saw in the sandbox.</p></details>
+        <details><summary>Which systems does FleetFlow connect to?</summary><p>Common TMS, ELD and WMS platforms out of the box, plus email, SMS and Slack for notifications. Agents read through scoped, read-only connections unless a capability explicitly allows writes.</p></details>
+        <details><summary>How long does it take to go live?</summary><p>Most teams connect data in a day and run every agent in Observe mode for a week. Then they use the sandbox to raise autonomy one capability at a time.</p></details>
+      </div>
+    </section>
+
+    <section class="final reveal" id="demo">
+      <h2>Put six agents on shift tomorrow.</h2>
+      <p>See FleetFlow on your own loads in a 30-minute demo, with nothing going live until you say so.</p>
+      <div class="hero ctas" style="padding:0">
+        <a class="btn light" href="mailto:hello@fleetflow.ai?subject=FleetFlow%20AI%20demo">Book a demo</a>
+        <a class="btn ghost" href="app/">Explore the product</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="#" class="brand"><span class="mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 19V9a4 4 0 0 1 4-4h10"/><path d="M9 19v-6a2 2 0 0 1 2-2h8"/><circle cx="17" cy="17" r="2"/></svg></span>FleetFlow AI</a>
+    <nav><a href="#agents">Agents</a><a href="#control">Control</a><a href="#pricing">Pricing</a><a href="app/">Product</a></nav>
+    <span>© 2026 FleetFlow AI</span>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
