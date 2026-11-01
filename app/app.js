@@ -43,6 +43,16 @@ const P = {
   plug: '<path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0V8ZM12 17v4"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  inbox: '<path d="M4 13 6.5 5h11L20 13v6H4v-6Z"/><path d="M4 13h4.5l1 2h5l1-2H20"/>',
+  map: '<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2V6Z"/><path d="M9 4v14M15 6v14"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  filter: '<path d="M4 5h16l-6 8v6l-4-1v-5L4 5Z"/>',
+  more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  pin: '<path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
+  fuel: '<path d="M4 20V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15M3 20h12M4 10h10M14 8l3 3v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  thermo: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0Z"/>',
   sparkles: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3ZM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/>',
 };
 const icon = (n, s = 16, sw = 1.8) =>
@@ -254,18 +264,22 @@ function toast(msg, undo) {
 
 // ---------------------------------------------------------------- chrome
 function rail(route) {
+  const pending = (window.INBOX || []).length;
+  const openEx = (window.EXCEPTIONS || []).filter(x => !x.resolved).length;
   const items = [
-    ['#/agents', 'grid', 'AI agents', route.startsWith('agents')],
-    ['#/activity', 'list', 'Activity log', route === 'activity'],
-    ['#/agents', 'send', 'Dispatch', false, 'hide-sm'],
-    ['#/agents', 'box', 'Shipments', false, 'hide-sm'],
-    ['#/agents', 'route', 'Routes', false, 'hide-sm'],
-    ['#/agents', 'alert', 'Exceptions', false, '', 3],
+    ['#/overview', 'grid', 'Overview', route === 'overview'],
+    ['#/agents', 'sparkles', 'AI agents', route.startsWith('agents')],
+    ['#/inbox', 'inbox', 'Approvals', route === 'inbox', '', pending],
+    ['#/shipments', 'box', 'Shipments', route === 'shipments', 'hide-sm'],
+    ['#/dispatch', 'send', 'Dispatch board', route === 'dispatch', 'hide-sm'],
+    ['#/routes', 'route', 'Live routes', route === 'routes', 'hide-sm'],
+    ['#/exceptions', 'alert', 'Exceptions', route === 'exceptions', 'hide-sm', openEx],
   ];
   const items2 = [
-    ['#/agents', 'users', 'Customers', false, 'hide-sm'],
-    ['#/agents', 'truck', 'Fleet', false, 'hide-sm'],
-    ['#/agents', 'doc', 'Reports', false, 'hide-sm'],
+    ['#/customers', 'users', 'Customers', route === 'customers', 'hide-sm'],
+    ['#/fleet', 'truck', 'Fleet', route === 'fleet', 'hide-sm'],
+    ['#/reports', 'chart', 'Reports', route === 'reports', 'hide-sm'],
+    ['#/activity', 'list', 'Activity log', route === 'activity', 'hide-sm'],
   ];
   const link = ([h, ic, label, on, cls = '', badge]) =>
     `<a href="${h}" class="${on ? 'on' : ''} ${cls}" title="${label}" aria-label="${label}">${icon(ic, 18)}${badge ? `<span class="dot">${badge}</span>` : ''}</a>`;
@@ -276,7 +290,7 @@ function rail(route) {
     ${items2.map(link).join('')}
     <div class="spacer"></div>
     ${link(['#/settings', 'settings', 'Settings', route === 'settings'])}
-    ${link(['#/agents', 'help', 'Help', false, 'hide-sm'])}
+    <a href="#" data-act="help" class="hide-sm" title="Help & shortcuts" aria-label="Help">${icon('help', 18)}</a>
     <span class="avatar" style="background:${PEOPLE.you.c}" title="${PEOPLE.you.name}">${PEOPLE.you.i}</span>
   </nav>`;
 }
@@ -288,12 +302,13 @@ function topbar({ crumb, title, back, actions }) {
       <h1 class="title">${back ? `<a class="back" href="${back}" aria-label="Back">${icon('back', 18)}</a>` : ''}${title}</h1>
     </div>
     <div class="actions">${actions}
-      <button class="icon-btn" type="button" aria-label="Notifications">${icon('bell', 18)}<span class="ping"></span></button>
+      <button class="icon-btn" type="button" data-act="notifs" aria-label="Notifications">${icon('bell', 18)}<span class="ping"></span></button>
     </div>
   </header>`;
 }
-const searchBox = (ph = 'Search shipments, drivers…', id = '') =>
-  `<label class="search">${icon('search', 14)}<input ${id ? `id="${id}"` : ''} placeholder="${ph}" aria-label="Search"><span class="kbd">⌘K</span></label>`;
+const searchBox = (ph = 'Search shipments, drivers…', id = '') => !id
+  ? `<button type="button" class="search" data-act="palette">${icon('search', 14)}<span style="flex:1;text-align:left;font-size:12px">${ph}</span><span class="kbd">⌘K</span></button>`
+  : `<label class="search">${icon('search', 14)}<input ${id ? `id="${id}"` : ''} placeholder="${ph}" aria-label="Search"><span class="kbd">⌘K</span></label>`;
 const pauseBtn = () => state.paused
   ? `<button class="btn accent" type="button" data-act="resume">${icon('play', 13, 2.2)}Resume agents</button>`
   : `<button class="btn dark" type="button" data-act="pause">${icon('pause', 13, 2.2)}Pause all agents</button>`;
@@ -417,8 +432,17 @@ function viewAgent(id) {
   </div>`;
 }
 
-function viewSettings() {
-  const nav = [['building', 'Organization'], ['users', 'Team & roles'], ['bell', 'Notifications'], ['plug', 'Integrations'], ['sparkles', 'AI & automation', true], ['card', 'Billing'], ['key', 'Security']];
+const SETTINGS_NAV = [['organization', 'building', 'Organization'], ['team', 'users', 'Team & roles'], ['notifications', 'bell', 'Notifications'], ['integrations', 'plug', 'Integrations'], ['ai', 'sparkles', 'AI & automation'], ['billing', 'card', 'Billing'], ['security', 'key', 'Security']];
+const settingsNav = (tab) => `<nav class="snav">${SETTINGS_NAV.map(([k, ic, l]) => `<a href="#/settings/${k}" class="${k === tab ? 'on' : ''}">${icon(ic, 15)}${l}</a>`).join('')}</nav>`;
+function viewSettings(tab = 'ai') {
+  if (tab !== 'ai' && window.SETTINGS_TABS?.[tab]) {
+    const label = SETTINGS_NAV.find(n => n[0] === tab)[2];
+    return `${topbar({ crumb: `Settings / ${label}`, title: 'Settings',
+      actions: `<a class="btn ghost" href="#/activity">${icon('eye', 14)}View audit log</a>
+      <button class="btn dark" type="button" data-act="save">${icon('check', 14, 2.4)}Save changes</button>` })}
+    ${pausedBanner()}
+    <div class="settings two-col">${settingsNav(tab)}<div class="stab" style="min-width:0">${SETTINGS_TABS[tab]()}</div></div>`;
+  }
   return `${topbar({
     crumb: 'Settings / AI & automation', title: 'Settings',
     actions: `<a class="btn ghost" href="#/activity">${icon('eye', 14)}View audit log</a>
@@ -426,7 +450,7 @@ function viewSettings() {
   })}
   ${pausedBanner()}
   <div class="settings">
-    <nav class="snav">${nav.map(([ic, l, on]) => `<a href="#/settings" class="${on ? 'on' : ''}">${icon(ic, 15)}${l}</a>`).join('')}</nav>
+    ${settingsNav('ai')}
     <div style="display:grid;gap:14px;min-width:0">
       <div>
         <h3 class="h3">AI & automation</h3>
@@ -593,16 +617,19 @@ function pauseModal() {
 
 // ---------------------------------------------------------------- router
 function route() {
-  const h = location.hash.replace(/^#\/?/, '') || 'agents';
+  const h = location.hash.replace(/^#\/?/, '') || 'overview';
   const [root, sub] = h.split('/');
   let html;
   if (root === 'agents' && sub) html = viewAgent(sub);
-  else if (root === 'settings') html = viewSettings();
+  else if (root === 'agents') html = viewAgents();
+  else if (root === 'settings') html = viewSettings(sub || 'ai');
   else if (root === 'activity') html = viewActivity();
-  else html = viewAgents();
+  else if (window.VIEWS?.[root]) html = VIEWS[root](sub);
+  else html = VIEWS.overview();
   const app = $('#app');
   app.innerHTML = `<div class="shell">${rail(root === 'agents' && sub ? 'agents-detail' : root)}<main class="main"><div class="view">${html}</div></main></div>`;
   mountChart();
+  window.afterRender?.(root, sub);
 }
 
 function rerender() {
@@ -679,7 +706,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
   if (e.key === 'Enter' && e.target.matches('[data-go]')) location.hash = e.target.dataset.go;
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.search input')?.focus(); }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); window.openPalette?.(); }
 });
 
 document.addEventListener('change', (e) => {
@@ -707,4 +734,5 @@ function exportCSV() {
 // Embedded mode (marketing page iframe): ?embed=1 hides nothing but disables framing padding
 if (!new URLSearchParams(location.search).has('embed')) document.body.classList.add('framed');
 window.addEventListener('hashchange', () => { closeModal(); route(); window.scrollTo(0, 0); });
-route();
+// views.js registers the remaining screens; render once every script has run.
+document.addEventListener('DOMContentLoaded', route);

@@ -11,12 +11,25 @@ No build step, no dependencies: plain HTML, CSS and JavaScript.
 
 ## Product screens (`app/`)
 
-- `#/agents`: **AI agents** overview with a dark KPI banner ("1,912 actions today, 94% needed no human…") and six agent cards showing status, metrics, latest action and autonomy bar
-- `#/agents/:id`: **Agent detail** with mission, approval stats, per-capability autonomy controls (Observe → Recommend → Draft → Approve first → Autonomous), a 30-day actions chart with tooltip, guardrails and recent decisions
-  - **Test in sandbox**: opens the *Sandbox results* modal, which replays your draft policy on last week's loads, then *Publish draft*
-- `#/settings`: **Settings → AI & automation** with the default autonomy level, permissions by capability, data access, global running toggle, approvers and policies
-- `#/activity`: **Activity log** with working filters (agent / decision / outcome), search and CSV export
-- **Pause all agents**: confirmation modal with impact summary, duration, reason and team notification. Pausing updates every screen, and you can resume or undo it.
+Every icon in the sidebar opens a working screen. State is kept in memory, so approvals, assignments and toggles carry across screens until you reload.
+
+| Route | Screen |
+| --- | --- |
+| `#/overview` | Home: KPIs with sparklines, live network map, "Needs your decision", shipments by status, agent activity, fleet health |
+| `#/agents` | AI agents overview (dark KPI banner + six agent cards) |
+| `#/agents/:id` | Agent detail: autonomy per capability, 30-day chart, guardrails, recent decisions, **Test in sandbox** |
+| `#/inbox` | Approvals: agent reasoning, options scored, approve / override (override requires a reason), undo |
+| `#/shipments` | Shipments table with status tabs and search; row opens a drawer with timeline and AI driver suggestion |
+| `#/dispatch` | Dispatch board: drag-and-drop columns, one-click "Assign" to the suggested driver, drivers with HOS bars |
+| `#/routes` | Live routes: animated trucks on a Bay Area map, route list, approve the proposed reroute |
+| `#/exceptions` | Exceptions: severity list, prepared fix, evidence, approve / escalate / reopen |
+| `#/customers` | Customer accounts with health; drawer with the Customer Agent conversation and reply composer |
+| `#/fleet` | Vehicles with health rings, fuel, alerts and the maintenance schedule |
+| `#/reports` | Ask the Operations Analyst, on-time trend, cost per mile, hours saved by agent, lane margins |
+| `#/activity` | Activity log with filters, search and CSV export |
+| `#/settings/:tab` | Organization, Team & roles, Notifications, Integrations, AI & automation, Billing, Security |
+
+Global: **⌘K / Ctrl+K** command palette, notifications popover, **Pause all agents** modal, **New shipment** form, `?` for shortcuts, `g` + letter to jump (g o, g i, g s, g d, g r, g e…).
 
 ## Run locally
 
