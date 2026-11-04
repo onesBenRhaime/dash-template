@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dash UI · Components</title>
+  <meta name="description" content="Live gallery of the Dash UI dashboard kit: tokens, components, overlays and charts, with copy-paste code for each.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234f46e5'/%3E%3Crect x='6' y='6' width='5' height='5' rx='1.2' fill='white'/%3E%3Crect x='13' y='6' width='5' height='5' rx='1.2' fill='white'/%3E%3Crect x='6' y='13' width='5' height='5' rx='1.2' fill='white'/%3E%3Crect x='13' y='13' width='5' height='5' rx='1.2' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    body { background: var(--bg); }
+    .doc { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+    .doc-head { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+    .doc-head h1 { font-size: 34px; font-weight: 500; letter-spacing: -.03em; margin: 0; }
+    .doc-head .ver { font-size: 11px; color: var(--muted); border: 1px solid var(--line-2); padding: 2px 8px; border-radius: 999px; }
+    .doc-head .tools { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .lede { color: var(--ink-2); font-size: 15px; max-width: 620px; margin: 0 0 10px; }
+    .swatches { display: flex; gap: 6px; }
+    .swatches button { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line-2); }
+    nav.toc { display: flex; gap: 6px; flex-wrap: wrap; margin: 24px 0 8px; position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 5; border-bottom: 1px solid var(--line); }
+    nav.toc a { font-size: 12px; padding: 5px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line-2); color: var(--ink-2); }
+    nav.toc a:hover { border-color: var(--accent-400); color: var(--accent); }
+    section.grp { padding-top: 36px; }
+    section.grp > h2 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; margin: 0 0 4px; }
+    section.grp > p { color: var(--muted); font-size: 13px; margin: 0 0 16px; max-width: 640px; }
+    .ex { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+    .ex > figcaption { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 600; }
+    .ex > figcaption span { font-weight: 400; color: var(--muted); }
+    .ex > figcaption .copy { margin-left: auto; font-size: 11px; color: var(--muted); border: 1px solid var(--line-2); border-radius: 7px; padding: 3px 9px; }
+    .ex > figcaption .copy:hover { color: var(--accent); border-color: var(--accent-400); }
+    .stage { padding: 20px 16px; background: var(--card-2); }
+    .stage.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .stage.dark-bg { background: var(--dark); }
+    pre { margin: 0; padding: 12px 14px; border-top: 1px solid var(--line); overflow-x: auto; background: var(--surface); }
+    code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; color: var(--ink-2); line-height: 1.6; }
+    .tok-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .tok { display: flex; align-items: center; gap: 9px; font-size: 11px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 7px 9px; }
+    .tok i { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--line-2); flex: none; }
+    .tok b { font-weight: 500; display: block; }
+    .tok small { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+    .icon-cell { display: grid; justify-items: center; gap: 5px; padding: 10px 4px; border-radius: 9px; font-size: 10px; color: var(--muted); cursor: pointer; }
+    .icon-cell:hover { background: var(--card); color: var(--accent); }
+    .note { background: var(--accent-50); border: 1px solid var(--accent-150); border-radius: 12px; padding: 12px 14px; font-size: 13px; color: var(--ink-2); margin-bottom: 16px; }
+    .note b { color: var(--ink); }
+  </style>
+</head>
+<body>
+<div class="doc">
+  <header class="doc-head">
+    <h1>Dash UI</h1>
+    <span class="ver" id="ver"></span>
+    <div class="tools">
+      <div class="swatches" id="swatches" title="Accent colour"></div>
+      <button class="btn" type="button" id="theme-btn"></button>
+      <a class="btn" href="../starter/">Starter app</a>
+      <a class="btn dark" href="../app/">Full example</a>
+    </div>
+  </header>
+  <p class="lede">A dependency-free dashboard kit: one stylesheet, one script, no build step. Every example below is rendered by the code shown under it.</p>
+  <nav class="toc" id="toc"></nav>
+  <main id="out"></main>
+</div>
+
+<script src="ui.js"></script>
+<script>
+/* Each example stores its code as a string and renders by evaluating it, so the
+   snippet you copy is literally the code that produced the output above it. */
+const GROUPS = [
+  {
+    id: 'tokens', title: 'Design tokens', blurb: 'Every colour resolves to a CSS variable on :root. Override them in your own stylesheet and the whole kit follows — including the two themes.',
+    custom: () => tokenSwatches(),
+  },
+  {
+    id: 'buttons', title: 'Buttons', blurb: 'One .btn class with variant and size modifiers. Pass href to render an anchor instead of a button.',
+    examples: [
+      { name: 'Variants', stage: 'inline', code: `UI.btn({ label: 'Default' }) +
+UI.btn({ label: 'Primary', variant: 'dark' }) +
+UI.btn({ label: 'Accent', variant: 'accent', icon: 'check' }) +
+UI.btn({ label: 'Danger', variant: 'danger', icon: 'pause' }) +
+UI.btn({ label: 'Ghost', variant: 'ghost' })` },
+      { name: 'Sizes and links', stage: 'inline', code: `UI.btn({ label: 'Small', size: 'sm' }) +
+UI.btn({ label: 'Extra small', size: 'xs', variant: 'accent' }) +
+UI.btn({ label: 'As a link', href: '#tokens', icon: 'arrow' }) +
+UI.iconBtn({ icon: 'bell', label: 'Notifications', dot: true })` },
+    ],
+  },
+  {
+    id: 'status', title: 'Status and identity', blurb: 'Pills carry a tone, not a meaning — pick the tone that matches your domain. Add plain to drop the leading dot.',
+    examples: [
+      { name: 'Pills', stage: 'inline', code: `UI.pill('Active', 'green') +
+UI.pill('Needs you · 3', 'amber') +
+UI.pill('Failed', 'red') +
+UI.pill('Draft', 'accent') +
+UI.pill('Paused', 'gray') +
+UI.pill('v3.2', 'gray', { plain: true })` },
+      { name: 'Avatars', stage: 'inline', code: `UI.avatar({ name: 'Alex Morgan', color: '#8b5a2b', size: 'lg' }) +
+UI.avatar({ name: 'Priya Nair', color: '#a2574c' }) +
+UI.avatar({ name: 'James Whitaker', color: '#3b3b44', size: 'sm' }) +
+UI.avatar({ initials: '+4', color: '#5a7d8c' })` },
+      { name: 'Meters and progress', stage: 'inline', code: `UI.meter(3) +
+UI.dots(4) +
+'<div style="width:160px">' + UI.progress(72) + '</div>' +
+UI.ring(91) + UI.ring(74) + UI.ring(58)` },
+    ],
+  },
+  {
+    id: 'controls', title: 'Controls', blurb: 'Segmented control, switch and form fields. All of them are plain HTML, so wire them up with one delegated listener.',
+    examples: [
+      { name: 'Segmented control', code: `UI.seg({
+  options: ['Observe', 'Recommend', 'Draft', 'Approve first', 'Autonomous'],
+  value: 3,
+  lock: [3],
+  attrs: 'data-perm="0"',
+})` },
+      { name: 'Switches', stage: 'inline', code: `UI.toggle(true) + UI.toggle(false) + UI.kbd('⌘K') + UI.kbd('esc')` },
+      { name: 'Fields', code: `'<div class="form-grid">' +
+  UI.field({ label: 'Company name', value: 'Northline Logistics' }) +
+  UI.field({ label: 'Time zone', type: 'select', value: 'Pacific', options: ['Pacific', 'Mountain', 'Central'] }) +
+  UI.field({ label: 'Escalate after', value: '15', type: 'number', hint: 'Minutes before the backup approver is paged.' }) +
+  UI.field({ label: 'Reason', type: 'textarea', placeholder: 'Shared with the team' }) +
+'</div>'` },
+      { name: 'Search', stage: 'inline', code: `UI.search({ placeholder: 'Search shipments, drivers…' }) +
+UI.search({ id: 'demo-q', placeholder: 'Filter this table…' })` },
+    ],
+  },
+  {
+    id: 'data', title: 'Data display', blurb: 'KPI tiles, tabs, tables and empty states. Rows are plain <tr> strings so you keep full control of each cell.',
+    examples: [
+      { name: 'KPI row', code: `'<div class="kpi-row">' +
+  UI.kpi({ label: 'Active shipments', value: '214', sub: '<b class="up">+12</b> vs last Monday',
+           aside: UI.sparkline(UI.series(1, 14, 200, 30)) }) +
+  UI.kpi({ label: 'On-time delivery', value: '96.1%', tone: 'green', sub: '<b class="up">+1.4 pts</b> this week',
+           aside: UI.sparkline(UI.series(2, 14, 95, 2), { color: 'var(--green)' }) }) +
+  UI.kpi({ label: 'Open exceptions', value: '6', tone: 'amber', sub: '<b class="down">2 high</b> severity' }) +
+  UI.kpi({ label: 'Revenue today', value: '$182.4K', sub: '<b class="up">+8.2%</b> vs average' }) +
+'</div>'` },
+      { name: 'Tabs', code: `UI.tabs({
+  active: 'all',
+  act: 'ship-tab',
+  tabs: [['all', 'All', 40], ['open', 'In transit', 13], ['done', 'Delivered', 11], ['late', 'Delayed', 3]],
+})` },
+      { name: 'Table', code: `UI.table({
+  columns: ['Shipment', 'Lane', 'Driver', 'Status'],
+  rows: [
+    ['SF-48305', 'Hayward → San Jose', 'Luis Hernandez', UI.pill('In transit', 'green')],
+    ['SF-48291', 'Fremont → Sacramento', 'Emily Chen', UI.pill('Delayed', 'amber')],
+    ['SF-48613', 'Tracy → Richmond', 'Diego Ramos', UI.pill('Delivered', 'gray')],
+  ].map(r => '<tr class="click"><td><b class="mono">' + r[0] + '</b></td><td>' + r[1] +
+             '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>'),
+})` },
+      { name: 'Empty state', code: `UI.empty({
+  icon: 'check',
+  title: 'Inbox zero',
+  text: 'Every decision is made. Agents will ask here when something needs a person.',
+  action: UI.btn({ label: 'See what they did', href: '#data' }),
+})` },
+      { name: 'Timeline', code: `UI.timeline([
+  { title: 'Created from EDI 204', sub: 'Customer Agent', meta: '06:12', done: true },
+  { title: 'Driver assigned', sub: 'approved by James', meta: '06:40', done: true },
+  { title: 'Picked up', sub: 'Luis Hernandez', meta: '07:30', done: true },
+  { title: 'Delivered', sub: 'POD captured', tag: UI.pill('Waiting', 'amber', { plain: true }) },
+])` },
+    ],
+  },
+  {
+    id: 'charts', title: 'Charts', blurb: 'Small inline SVG charts with no dependency. Colours come from tokens, so they re-theme with everything else.',
+    examples: [
+      { name: 'Line chart', code: `UI.lineChart(UI.series(11, 30, 95.2, 3).map(v => Math.min(99, v)), {
+  min: 89, max: 99, target: 95, targetLabel: 'Target 95%',
+  labels: [[0, 'Oct 3'], [15, 'Oct 18'], [29, 'Today']],
+})` },
+      { name: 'Donut and sparkline', stage: 'inline', code: `'<div class="row" style="gap:24px">' +
+  UI.donut([[79, 'var(--green)'], [4, 'var(--amber)'], [3, 'var(--muted-2)']], 120, 14) +
+  UI.sparkline(UI.series(4, 20, 170, 20), { color: 'var(--ink)', width: 160, height: 44 }) +
+  UI.ring(86, 56) +
+'</div>'` },
+      { name: 'Bar chart with tooltip', code: `'<div class="chart" id="demo-chart" style="height:150px"></div>' +
+'<div class="axis"><span>Oct 3</span><span>Oct 18</span><span>Today</span></div>'`,
+        after: () => UI.barChart(document.getElementById('demo-chart'),
+          UI.series(7, 30, 300, 120).map((v, i) => ({ auto: Math.round(v), ap: 8 + (i % 7) * 3 })), {
+            series: [{ key: 'auto' }, { key: 'ap', className: 'ap' }],
+            label: (d) => '<div class="between"><span>Automatic</span><b>' + d.auto + '</b></div>' +
+                          '<div class="between"><span>Needed approval</span><b>' + d.ap + '</b></div>',
+          }) },
+    ],
+  },
+  {
+    id: 'overlays', title: 'Overlays', blurb: 'Toast, modal, confirm, drawer, anchored popover and a command palette. Escape and backdrop clicks are handled for you; any [data-close] element dismisses its overlay.',
+    examples: [
+      { name: 'Toast', stage: 'inline', code: `UI.btn({ label: 'Show a toast', variant: 'dark', attrs: { onclick: "UI.toast('Changes saved')" } }) +
+UI.btn({ label: 'With undo', attrs: { onclick: "UI.toast('6 agents paused', { undo: () => UI.toast('Restored') })" } })` },
+      { name: 'Modal and confirm', stage: 'inline', code: `UI.btn({ label: 'Open modal', variant: 'dark', attrs: { onclick: 'demoModal()' } }) +
+UI.btn({ label: 'Confirm dialog', variant: 'danger', attrs: { onclick: 'demoConfirm()' } })` },
+      { name: 'Drawer', stage: 'inline', code: `UI.btn({ label: 'Open drawer', variant: 'dark', attrs: { onclick: 'demoDrawer()' } })` },
+      { name: 'Popover and palette', stage: 'inline', code: `UI.iconBtn({ icon: 'bell', label: 'Notifications', dot: true,
+  attrs: { 'data-popover': true, onclick: 'demoPopover(this)' } }) +
+UI.btn({ label: 'Command palette', icon: 'search', attrs: { onclick: 'demoPalette()' } })` },
+    ],
+  },
+  {
+    id: 'layout', title: 'Layout', blurb: 'The app shell: an icon rail, a page header and the scrolling main column. UI.shell() returns the markup your router mounts.',
+    examples: [
+      { name: 'Page header', code: `UI.topbar({
+  crumb: '<a href="#layout">Operations</a> / Shipments',
+  title: 'Shipments',
+  back: '#layout',
+  actions: UI.search({ placeholder: 'Search…' }) +
+           UI.btn({ label: 'Export', icon: 'download' }) +
+           UI.btn({ label: 'New shipment', icon: 'plus', variant: 'dark' }),
+})` },
+      { name: 'Icon rail', code: `'<div style="height:330px;display:flex;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--line)">' +
+  UI.rail({
+    logo: { href: '#layout', icon: 'logo', label: 'Home' },
+    items: [
+      { href: '#layout', icon: 'grid', label: 'Overview', active: true },
+      { href: '#layout', icon: 'inbox', label: 'Approvals', badge: 5 },
+      { href: '#layout', icon: 'box', label: 'Shipments' },
+      { href: '#layout', icon: 'truck', label: 'Fleet' },
+      { sep: true },
+      { href: '#layout', icon: 'chart', label: 'Reports' },
+      { spacer: true },
+    ],
+    footer: [{ href: '#layout', icon: 'settings', label: 'Settings' }],
+    avatar: UI.avatar({ name: 'Alex Morgan', color: '#8b5a2b' }),
+  }) +
+  '<div style="flex:1;padding:18px">' +
+    UI.topbar({ crumb: 'Operations', title: 'Overview', actions: UI.btn({ label: 'Today', icon: 'cal', size: 'sm' }) }) +
+    '<div class="kpi-row" style="grid-template-columns:1fr 1fr">' +
+      UI.kpi({ label: 'Open loads', value: '26', sub: '6 unassigned' }) +
+      UI.kpi({ label: 'On time', value: '96%', tone: 'green', sub: 'last 7 days' }) +
+    '</div>' +
+  '</div>' +
+'</div>'` },
+    ],
+  },
+  {
+    id: 'icons', title: 'Icons', blurb: 'A stroked 24px set, inlined as SVG so it inherits currentColor. Click any icon to copy its name. Add your own with <code>UI.addIcons({ name: \'&lt;path …/&gt;\' })</code>.',
+    custom: () => iconGrid(),
+  },
+];
+
+/* ---------------------------------------------------------------- render */
+const TOKEN_GROUPS = [
+  ['Surfaces', ['bg', 'surface', 'card', 'card-2', 'chip', 'line', 'line-2', 'track', 'track-2']],
+  ['Text', ['ink', 'ink-2', 'on-ink', 'muted', 'muted-2', 'muted-3']],
+  ['Accent', ['accent-50', 'accent-100', 'accent-150', 'accent-200', 'accent-300', 'accent-400', 'accent-500', 'accent-600', 'accent']],
+  ['Status', ['green', 'green-soft', 'amber', 'amber-soft', 'amber-ink', 'red', 'red-soft', 'live']],
+  ['Always dark', ['dark', 'dark-2', 'dark-line']],
+];
+function tokenSwatches() {
+  const cs = getComputedStyle(document.documentElement);
+  return TOKEN_GROUPS.map(([name, keys]) => `
+    <figure class="ex"><figcaption>${name}<span>${keys.length} tokens</span></figcaption>
+      <div class="stage"><div class="tok-grid">${keys.map(k => `
+        <div class="tok"><i style="background:var(--${k})"></i>
+          <div><b>--${k}</b><small>${cs.getPropertyValue('--' + k).trim() || '—'}</small></div></div>`).join('')}
+      </div></div></figure>`).join('');
+}
+function iconGrid() {
+  return `<figure class="ex"><figcaption>${Object.keys(UI.icons).length} icons<span>click to copy a name</span></figcaption>
+    <div class="stage"><div class="icon-grid">${Object.keys(UI.icons).sort().map(n => `
+      <button class="icon-cell" type="button" onclick="copyText('${n}', this)">${UI.icon(n, 20)}${n}</button>`).join('')}
+    </div></div>
+    <pre><code>UI.icon('truck', 18)      // size in px
+UI.icon('alert', 14, 2.2) // size, stroke width
+UI.addIcons({ gauge: '&lt;circle cx="12" cy="12" r="8"/&gt;' })</code></pre></figure>`;
+}
+
+function renderExample(ex) {
+  let out = '';
+  try {
+    out = new Function('UI', 'return (' + ex.code + ')')(UI);
+  } catch (err) {
+    out = '<span class="muted">Example failed: ' + UI.esc(err.message) + '</span>';
+  }
+  return `<figure class="ex">
+    <figcaption>${ex.name}<button class="copy" type="button" onclick="copyCode(this)">Copy</button></figcaption>
+    <div class="stage ${ex.stage || ''}">${out}</div>
+    <pre><code>${UI.esc(ex.code)}</code></pre>
+  </figure>`;
+}
+
+document.getElementById('ver').textContent = 'v' + UI.version;
+document.getElementById('toc').innerHTML = GROUPS.map(g => `<a href="#${g.id}">${g.title}</a>`).join('');
+document.getElementById('out').innerHTML = GROUPS.map(g => `
+  <section class="grp" id="${g.id}">
+    <h2>${g.title}</h2><p>${g.blurb}</p>
+    ${g.custom ? g.custom() : g.examples.map(renderExample).join('')}
+  </section>`).join('');
+GROUPS.forEach(g => (g.examples || []).forEach(ex => ex.after && ex.after()));
+
+/* ---------------------------------------------------------------- demos */
+function demoModal() {
+  UI.modal(`
+    <div class="mh"><h3>Publish draft policy?</h3>
+      <p>The draft replaces live policy v3.2 for every agent in this workspace.</p>
+      <button class="close" type="button" data-close aria-label="Close">${UI.icon('x', 16)}</button></div>
+    <div class="mb">
+      <div class="four">
+        ${UI.card('<div class="label">On time</div><div class="v num">96.8%</div><div class="s">+2.6 pts</div>')}
+        ${UI.card('<div class="label">Empty miles</div><div class="v num">−4.1%</div><div class="s">312 fewer</div>')}
+        ${UI.card('<div class="label">Approvals</div><div class="v num">38</div><div class="s m">7 fewer</div>')}
+        ${UI.card('<div class="label">Rule breaks</div><div class="v num">0</div><div class="s m">All held</div>')}
+      </div>
+      ${UI.field({ label: 'Note for the audit trail', type: 'textarea', placeholder: 'Why this change?' })}
+    </div>
+    <div class="mf"><span class="note">${UI.icon('shield', 13)}Logged with your name</span>
+      ${UI.btn({ label: 'Keep editing', attrs: { 'data-close': true } })}
+      ${UI.btn({ label: 'Publish', variant: 'accent', attrs: { 'data-close': true, onclick: "UI.toast('Published as v3.3')" } })}
+    </div>`);
+}
+function demoConfirm() {
+  UI.confirm({
+    title: 'Pause all agents?',
+    text: 'Every agent stops acting right away. Anything already sent stays sent.',
+    note: 'Logged to the audit trail',
+    danger: true,
+    confirmLabel: 'Pause all agents',
+    body: UI.field({ label: 'Reason · shared with the team', type: 'textarea', placeholder: 'What looks wrong?' }),
+    onConfirm: () => UI.toast('6 agents paused', { undo: () => UI.toast('Agents resumed') }),
+  });
+}
+function demoDrawer() {
+  UI.drawer(`
+    <div class="dh"><div><div class="crumb">Shipment</div><h3>SF-48305</h3></div>
+      ${UI.pill('In transit', 'green')}
+      <button class="close" type="button" data-close aria-label="Close">${UI.icon('x', 16)}</button></div>
+    <div class="db">
+      <div class="route-card">
+        <div><span class="label">From</span><b>Hayward</b><small>Pickup 07:30</small></div>
+        ${UI.icon('arrow', 16)}
+        <div><span class="label">To</span><b>San Jose</b><small>Window 10:00–12:00</small></div>
+      </div>
+      ${UI.progress(62, { className: 'big transit' })}
+      <div class="kvgrid">
+        <div><span class="label">Customer</span><b>Acme Commerce</b></div>
+        <div><span class="label">Driver</span><b>Luis Hernandez</b></div>
+        <div><span class="label">Equipment</span><b>Dry van</b></div>
+        <div><span class="label">Weight</span><b>22,000 lb</b></div>
+      </div>
+      <div><div class="label" style="margin-bottom:8px">Timeline</div>
+      ${UI.timeline([
+        { title: 'Created from EDI 204', sub: 'Customer Agent', meta: '06:12', done: true },
+        { title: 'Driver assigned', sub: 'approved by James', meta: '06:40', done: true },
+        { title: 'Picked up', sub: 'Luis Hernandez', meta: '07:30', done: true },
+        { title: 'Delivered', sub: 'POD captured' },
+      ])}</div>
+    </div>
+    <div class="df">${UI.btn({ label: 'Close', attrs: { 'data-close': true } })}
+      ${UI.btn({ label: 'Message customer', icon: 'msg', variant: 'dark', attrs: { 'data-close': true } })}</div>`);
+}
+function demoPopover(el) {
+  if (document.querySelector('.notifs')) return UI.closePopover();
+  UI.popover(el, `<div class="between nh"><b>Notifications</b><button class="link" type="button">Mark all read</button></div>
+    ${[['Dispatch Agent needs an approval', '12 min ago', 1], ['Route Agent proposed a reroute', '19 min ago', 1],
+       ['Daily ops one-pager is ready', '09:24', 0]]
+      .map(([t, w, u]) => `<a href="#overlays" class="ni ${u ? 'unread' : ''}"><span class="ic-sq sm">${UI.icon('sparkles', 11, 2.2)}</span>
+        <div class="grow"><b>${t}</b><small>${w}</small></div></a>`).join('')}
+    <a class="nf" href="#overlays">Open activity log</a>`);
+}
+function demoPalette() {
+  UI.palette({
+    placeholder: 'Search pages, records, actions…',
+    items: [
+      { title: 'Overview', sub: 'Page', icon: 'grid', run: () => UI.toast('Would open Overview') },
+      { title: 'Approvals', sub: 'Page', icon: 'inbox', run: () => UI.toast('Would open Approvals') },
+      { title: 'Shipments', sub: 'Page', icon: 'box', run: () => UI.toast('Would open Shipments') },
+      { title: 'Pause all agents', sub: 'Action', icon: 'pause', run: () => demoConfirm() },
+      { title: 'Export activity log', sub: 'Action', icon: 'download', run: () => UI.toast('Exported 20 rows') },
+      { title: 'Acme Commerce', sub: 'Customer', icon: 'users', run: () => UI.toast('Would open Acme Commerce') },
+      { title: 'SF-48305', sub: 'Hayward → San Jose', icon: 'box', run: () => demoDrawer() },
+    ],
+  });
+}
+
+/* ---------------------------------------------------------------- chrome */
+function copyCode(btn) {
+  copyText(btn.closest('.ex').querySelector('code').textContent, btn);
+}
+function copyText(text, btn) {
+  const done = () => { const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = t), 1200); };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => UI.toast('Copy blocked by the browser'));
+  else UI.toast('Clipboard unavailable');
+}
+const themeBtn = document.getElementById('theme-btn');
+function paintTheme() {
+  const mode = UI.theme.get();
+  themeBtn.innerHTML = UI.icon(mode === 'dark' ? 'moon' : mode === 'light' ? 'sun' : 'globe', 14) +
+    'Theme: ' + mode;
+}
+themeBtn.onclick = () => {
+  const order = ['auto', 'light', 'dark'];
+  UI.theme.set(order[(order.indexOf(UI.theme.get()) + 1) % 3]);
+  paintTheme();
+  document.getElementById('out').querySelector('#tokens').innerHTML =
+    '<h2>Design tokens</h2><p>' + GROUPS[0].blurb + '</p>' + tokenSwatches();
+};
+UI.theme.restore();
+paintTheme();
+document.getElementById('swatches').innerHTML =
+  ['#4f46e5', '#0f766e', '#b45309', '#be123c', '#1d4ed8', '#7c3aed']
+    .map(c => `<button type="button" style="background:${c}" title="Accent ${c}" onclick="UI.theme.accent('${c}')"></button>`).join('');
+UI.shortcuts({ 'mod+k': () => demoPalette() });
+</script>
+</body>
+</html>

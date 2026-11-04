@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Starter · Dash UI</title>
+  <meta name="description" content="Minimal Dash UI dashboard: rail, router, KPIs, table and a detail drawer in about a hundred lines.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230e0e10'/%3E%3Crect x='6' y='6' width='5' height='5' rx='1.2' fill='white'/%3E%3Crect x='13' y='6' width='5' height='5' rx='1.2' fill='white'/%3E%3Crect x='6' y='13' width='5' height='5' rx='1.2' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../ui/ui.css">
+</head>
+<body class="framed">
+  <div id="app"></div>
+
+  <script src="../ui/ui.js"></script>
+  <script>
+  /* ------------------------------------------------------------------
+     A whole dashboard in one file. Replace DATA with your own records,
+     add entries to NAV and VIEWS, and you have a working app.
+     ------------------------------------------------------------------ */
+
+  const DATA = [
+    { id: 'INV-1042', customer: 'Acme Commerce',    owner: 'Priya Nair',   amount: 18400, status: 'paid',    due: 'Oct 28' },
+    { id: 'INV-1043', customer: 'Northline Foods',  owner: 'James Whitaker', amount: 9250, status: 'open',    due: 'Nov 6'  },
+    { id: 'INV-1044', customer: 'Bayfreight Retail',owner: 'Priya Nair',   amount: 31200, status: 'open',    due: 'Nov 9'  },
+    { id: 'INV-1045', customer: 'Redwood Supply',   owner: 'Sarah Bennett',amount: 4800,  status: 'overdue', due: 'Oct 21' },
+    { id: 'INV-1046', customer: 'Coastal Grocers',  owner: 'James Whitaker', amount: 15600, status: 'paid',  due: 'Oct 30' },
+    { id: 'INV-1047', customer: 'Meridian Pharma',  owner: 'Sarah Bennett',amount: 22100, status: 'open',    due: 'Nov 14' },
+  ];
+
+  const TONE = { paid: 'green', open: 'accent', overdue: 'red' };
+  const money = (n) => '$' + n.toLocaleString('en-US');
+
+  // Which screen each rail icon opens. `active` is filled in per render.
+  const NAV = [
+    { href: '#/overview', icon: 'grid',  label: 'Overview' },
+    { href: '#/invoices', icon: 'doc',   label: 'Invoices' },
+    { href: '#/people',   icon: 'users', label: 'People' },
+  ];
+
+  // ---------------------------------------------------------------- state
+  const state = { filter: 'all', query: '' };
+  const visible = () => DATA.filter((r) =>
+    (state.filter === 'all' || r.status === state.filter) &&
+    (r.id + r.customer + r.owner).toLowerCase().includes(state.query.toLowerCase()));
+
+  // ---------------------------------------------------------------- views
+  const VIEWS = {
+    overview: () => {
+      const sum = (s) => DATA.filter((r) => s === 'all' || r.status === s).reduce((a, r) => a + r.amount, 0);
+      return UI.topbar({
+        crumb: 'Finance',
+        title: 'Overview',
+        actions: UI.search({ placeholder: 'Search invoices…' }) +
+                 UI.btn({ label: 'New invoice', icon: 'plus', variant: 'dark', attrs: { 'data-act': 'new' } }),
+      }) + `
+      <div class="kpi-row">
+        ${UI.kpi({ label: 'Billed this month', value: money(sum('all')),
+                   sub: '<b class="up">+8.2%</b> vs last month',
+                   aside: UI.sparkline(UI.series(3, 14, 90, 18)) })}
+        ${UI.kpi({ label: 'Collected', value: money(sum('paid')), tone: 'green', sub: '2 of 6 invoices' })}
+        ${UI.kpi({ label: 'Outstanding', value: money(sum('open')), sub: '3 invoices, none past due' })}
+        ${UI.kpi({ label: 'Overdue', value: money(sum('overdue')), tone: 'amber', sub: '<b class="down">1 invoice</b> · 14 days' })}
+      </div>
+      <div class="cols-2">
+        ${UI.card(`<div class="between"><h3 class="h3">Collections, last 30 days</h3>${UI.pill('On track', 'green')}</div>
+          ${UI.lineChart(UI.series(9, 30, 72, 14), { min: 40, max: 100, target: 80, targetLabel: 'Target 80%',
+            labels: [[0, 'Oct 5'], [15, 'Oct 20'], [29, 'Today']] })}`)}
+        ${UI.card(`<div class="between"><h3 class="h3">Needs attention</h3><a class="link" href="#/invoices">All</a></div>
+          <div class="dlist">${DATA.filter((r) => r.status !== 'paid').slice(0, 3).map((r) => `
+            <div class="ditem"><span class="ic-sq">${UI.icon('doc', 13, 2)}</span>
+              <div class="grow"><b>${r.customer}</b><small>${r.id} · due ${r.due} · ${money(r.amount)}</small></div>
+              ${UI.pill(r.status, TONE[r.status], { plain: true })}</div>`).join('')}</div>`)}
+      </div>`;
+    },
+
+    invoices: () => UI.topbar({
+      crumb: '<a href="#/overview">Finance</a> / Invoices',
+      title: 'Invoices',
+      back: '#/overview',
+      actions: UI.search({ id: 'q', placeholder: 'Search invoices…', value: state.query }) +
+               UI.btn({ label: 'Export', icon: 'download', attrs: { 'data-act': 'export' } }),
+    }) +
+      UI.tabs({
+        active: state.filter,
+        act: 'filter',
+        tabs: [['all', 'All', DATA.length],
+               ['open', 'Open', DATA.filter((r) => r.status === 'open').length],
+               ['paid', 'Paid', DATA.filter((r) => r.status === 'paid').length],
+               ['overdue', 'Overdue', DATA.filter((r) => r.status === 'overdue').length]],
+      }) +
+      UI.table({
+        columns: ['Invoice', 'Customer', 'Owner', 'Amount', 'Due', 'Status'],
+        empty: 'No invoices match those filters.',
+        bodyId: 'rows',
+        rows: invoiceRows(),
+      }),
+
+    people: () => {
+      const owners = [...new Set(DATA.map((r) => r.owner))];
+      return UI.topbar({ crumb: 'Finance / People', title: 'People', back: '#/overview' }) +
+        `<div class="cols-3">${owners.map((name) => {
+          const rows = DATA.filter((r) => r.owner === name);
+          return UI.card(`<div class="row">${UI.avatar({ name, color: '#5a7d8c', size: 'lg' })}
+            <div><b>${name}</b><div class="sub">${rows.length} invoices · ${money(rows.reduce((a, r) => a + r.amount, 0))}</div></div></div>`);
+        }).join('')}</div>`;
+    },
+  };
+
+  // Rows are built on their own so search can refresh just the <tbody>.
+  const invoiceRows = () => visible().map((r) => `
+    <tr class="click" data-act="open" data-id="${r.id}">
+      <td><b class="mono">${r.id}</b></td>
+      <td>${r.customer}</td>
+      <td>${r.owner}</td>
+      <td class="num">${money(r.amount)}</td>
+      <td class="num">${r.due}</td>
+      <td>${UI.pill(r.status, TONE[r.status])}</td>
+    </tr>`);
+
+  // ---------------------------------------------------------------- drawer
+  function openInvoice(id) {
+    const r = DATA.find((x) => x.id === id);
+    UI.drawer(`
+      <div class="dh"><div><div class="crumb">Invoice</div><h3>${r.id}</h3></div>
+        ${UI.pill(r.status, TONE[r.status])}
+        <button class="close" type="button" data-close aria-label="Close">${UI.icon('x', 16)}</button></div>
+      <div class="db">
+        <div class="kvgrid">
+          <div><span class="label">Customer</span><b>${r.customer}</b></div>
+          <div><span class="label">Owner</span><b>${r.owner}</b></div>
+          <div><span class="label">Amount</span><b>${money(r.amount)}</b></div>
+          <div><span class="label">Due</span><b>${r.due}</b></div>
+        </div>
+        ${UI.timeline([
+          { title: 'Issued', sub: 'Sent to accounts payable', meta: 'Oct 14', done: true },
+          { title: 'Reminder sent', sub: 'Automatic, 7 days before due', meta: 'Oct 21', done: r.status !== 'paid' },
+          { title: 'Paid', sub: 'ACH transfer', meta: r.due, done: r.status === 'paid' },
+        ])}
+      </div>
+      <div class="df">${UI.btn({ label: 'Close', attrs: { 'data-close': true } })}
+        ${UI.btn({ label: 'Send reminder', icon: 'msg', variant: 'dark',
+                   attrs: { 'data-close': true, 'data-act': 'remind', 'data-id': r.id } })}</div>`);
+  }
+
+  // ---------------------------------------------------------------- router
+  const router = UI.router({
+    mount: '#app',
+    fallback: 'overview',
+    resolve: (route) => (VIEWS[route] || VIEWS.overview)(),
+    chrome: (html, route) => UI.shell({
+      rail: UI.rail({
+        logo: { href: '#/overview', icon: 'logo', label: 'Home' },
+        items: NAV.map((n) => ({ ...n, active: '#/' + route === n.href })).concat({ spacer: true }),
+        footer: [{ href: '#', icon: 'moon', label: 'Toggle theme', attrs: { 'data-act': 'theme' } }],
+        avatar: UI.avatar({ name: 'Alex Morgan', color: '#8b5a2b' }),
+      }),
+      main: html,
+    }),
+  });
+
+  // ---------------------------------------------------------------- events
+  // One delegated listener handles every [data-act] in the app.
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const id = el.dataset.id;
+    switch (el.dataset.act) {
+      case 'open': openInvoice(id); break;
+      case 'filter': state.filter = el.dataset.tab; router.rerender(); break;
+      case 'theme': e.preventDefault(); UI.theme.toggle(); break;
+      case 'remind': UI.toast(`Reminder sent for ${id}`, { undo: () => UI.toast('Reminder cancelled') }); break;
+      case 'export':
+        UI.toast(`Exported ${UI.downloadCSV('invoices.csv',
+          ['invoice', 'customer', 'owner', 'amount', 'due', 'status'],
+          visible().map((r) => [r.id, r.customer, r.owner, r.amount, r.due, r.status]))} rows`);
+        break;
+      case 'new': UI.confirm({
+        title: 'Create an invoice?',
+        text: 'This starter does not persist anything — wire it to your own API.',
+        confirmLabel: 'Create',
+        onConfirm: () => UI.toast('Invoice created'),
+      }); break;
+      case 'palette': openPalette(); break;
+    }
+  });
+
+  document.addEventListener('input', (e) => {
+    if (e.target.id !== 'q') return;
+    state.query = e.target.value;
+    const body = UI.$('#rows');
+    const rows = invoiceRows();
+    if (body) body.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" class="empty">No invoices match.</td></tr>';
+  });
+
+  const openPalette = () => UI.palette({
+    placeholder: 'Search pages and invoices…',
+    items: [
+      ...NAV.map((n) => ({ title: n.label, sub: 'Page', icon: n.icon, run: () => (location.hash = n.href) })),
+      ...DATA.map((r) => ({ title: `${r.id} · ${r.customer}`, sub: money(r.amount), icon: 'doc', run: () => openInvoice(r.id) })),
+      { title: 'Toggle theme', sub: 'Action', icon: 'moon', run: () => UI.theme.toggle() },
+    ],
+  });
+
+  UI.shortcuts({
+    'mod+k': openPalette,
+    'g o': () => (location.hash = '#/overview'),
+    'g i': () => (location.hash = '#/invoices'),
+    'g p': () => (location.hash = '#/people'),
+  });
+
+  UI.theme.restore();
+  router.render();
+  </script>
+</body>
+</html>

@@ -116,47 +116,13 @@ const drv = (i, size = 'sm') => { const d = DRIVERS[i]; return `<span class="ava
 const STATUS = { unassigned: ['gray', 'Unassigned'], assigned: ['accent', 'Assigned'], transit: ['green', 'In transit'], delayed: ['amber', 'Delayed'], delivered: ['gray', 'Delivered'] };
 const statusPillS = (s) => `<span class="pill ${STATUS[s][0]}">${STATUS[s][1]}</span>`;
 
-function spark(arr, color = 'var(--accent)', w = 96, h = 30) {
-  const mn = Math.min(...arr), mx = Math.max(...arr), sx = w / (arr.length - 1);
-  const pts = arr.map((v, i) => `${(i * sx).toFixed(1)},${(h - 3 - ((v - mn) / (mx - mn || 1)) * (h - 6)).toFixed(1)}`);
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="spark"><polyline fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" points="${pts.join(' ')}"/></svg>`;
-}
-const series = (seed, n, base, amp) => { const r = rng(seed); return Array.from({ length: n }, (_, i) => +(base + Math.sin(i / 3) * amp * .4 + (r() - .5) * amp).toFixed(1)); };
+const spark = (arr, color = 'var(--accent)', w = 96, h = 30) => UI.sparkline(arr, { color, width: w, height: h });
+const series = UI.series;
+const kpi = (label, value, sub, tone = '', aside = '') => UI.kpi({ label, value, sub, tone, aside });
 
-function kpi(label, value, sub, cls = '', sp = '') {
-  return `<div class="card kpi"><div class="between"><span class="label">${label}</span>${sp}</div>
-    <div class="kv num ${cls}">${value}</div><div class="ks">${sub}</div></div>`;
-}
-
-function lineChart(data, { w = 640, h = 180, min, max, target, color = 'var(--accent)', labels = [] } = {}) {
-  const mn = min ?? Math.min(...data), mx = max ?? Math.max(...data), sx = w / (data.length - 1);
-  const y = (v) => h - 8 - ((v - mn) / (mx - mn)) * (h - 16);
-  const pts = data.map((v, i) => [i * sx, y(v)]);
-  const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-  return `<svg viewBox="0 0 ${w} ${h + 18}" class="lchart" preserveAspectRatio="none">
-    <defs><linearGradient id="lg${w}${h}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6d63ff" stop-opacity=".22"/><stop offset="1" stop-color="#6d63ff" stop-opacity="0"/></linearGradient></defs>
-    ${[0, .5, 1].map(f => `<line x1="0" x2="${w}" y1="${8 + f * (h - 16)}" y2="${8 + f * (h - 16)}" stroke="#ececea"/>`).join('')}
-    ${target != null ? `<line x1="0" x2="${w}" y1="${y(target)}" y2="${y(target)}" stroke="#e08a00" stroke-dasharray="4 4"/><text x="4" y="${y(target) + 13}" class="ct">Target ${target}%</text>` : ''}
-    <path d="${d} L ${w} ${h} L 0 ${h} Z" fill="url(#lg${w}${h})"/>
-    <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
-    <circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="4" fill="${color}" stroke="#fff" stroke-width="2"/>
-    ${labels.map(([i, t]) => `<text x="${Math.min(Math.max(i * sx, 14), w - 14)}" y="${h + 14}" text-anchor="middle" class="ct">${t}</text>`).join('')}
-  </svg>`;
-}
-
-function donut(parts, size = 120, stroke = 14) {
-  const r = (size - stroke) / 2, c = 2 * Math.PI * r, total = parts.reduce((a, p) => a + p[0], 0);
-  let off = 0;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg)">
-    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#eeeeec" stroke-width="${stroke}"/>
-    ${parts.map(([v, col]) => { const len = (v / total) * c; const s = `<circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}" stroke-dasharray="${len - 2} ${c - len + 2}" stroke-dashoffset="${-off}" stroke-linecap="butt"/>`; off += len; return s; }).join('')}
-  </svg>`;
-}
-
-function ring(v, size = 44) {
-  const col = v >= 85 ? 'var(--green)' : v >= 70 ? 'var(--amber)' : 'var(--red)';
-  return `<span class="ring" style="width:${size}px;height:${size}px">${donut([[v, col], [100 - v, 'transparent']], size, 5)}<b>${v}</b></span>`;
-}
+const lineChart = (data, o = {}) => UI.lineChart(data, { ...o, targetLabel: o.target != null ? `Target ${o.target}%` : undefined });
+const donut = UI.donut;
+const ring = UI.ring;
 
 // ================================================================ map
 const ROUTES = [
@@ -175,18 +141,18 @@ const RCOL = { ok: '#0e0e10', reroute: '#4f46e5', risk: '#e08a00', late: '#e5383
 function mapSVG({ small = false, sel = null } = {}) {
   const routes = ROUTES.map(r => ({ ...r, status: ui.rerouted && r.status === 'reroute' ? 'ok' : r.status, path: pathOf(r.ship === 'SF-48231' && ui.rerouted ? r.alt : r.via) }));
   return `<svg viewBox="0 0 800 540" class="map ${small ? 'small' : ''}" role="img" aria-label="Live map of active routes">
-    <rect width="800" height="540" fill="#f3f3ef"/>
-    <path d="M0 0 H118 C108 96 150 178 192 262 C232 340 282 424 300 540 H0 Z" fill="#dfe7ee"/>
-    <path d="M176 118 C226 146 214 198 244 238 C276 282 330 334 390 404 C366 414 330 384 300 352 C258 310 222 272 200 232 C180 192 150 160 176 118 Z" fill="#dfe7ee"/>
-    <path d="M232 168 C262 150 286 132 312 128 C330 130 320 146 296 156 C276 164 254 176 232 168 Z" fill="#dfe7ee"/>
-    <g stroke="#e2e2dc" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="800" height="540" class="bg"/>
+    <path d="M0 0 H118 C108 96 150 178 192 262 C232 340 282 424 300 540 H0 Z" class="water"/>
+    <path d="M176 118 C226 146 214 198 244 238 C276 282 330 334 390 404 C366 414 330 384 300 352 C258 310 222 272 200 232 C180 192 150 160 176 118 Z" class="water"/>
+    <path d="M232 168 C262 150 286 132 312 128 C330 130 320 146 296 156 C276 164 254 176 232 168 Z" class="water"/>
+    <g class="road" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path d="${pathOf(['Santa Rosa', 'Vallejo', 'Sacramento'])}"/><path d="${pathOf(['Richmond', 'Oakland', 'Hayward', 'Fremont', 'San Jose', 'Salinas'])}"/>
       <path d="${pathOf(['Oakland', 'Livermore', 'Tracy', 'Stockton', 'Sacramento'])}"/><path d="${pathOf(['Tracy', 'Modesto'])}"/>
       <path d="${pathOf(['Hayward', 'Livermore', 'San Jose'])}"/><path d="${pathOf(['Vallejo', 'Richmond'])}"/>
     </g>
     ${ui.rerouted ? '' : `<path d="${pathOf(ROUTES[0].alt)}" fill="none" stroke="#4f46e5" stroke-width="3" stroke-dasharray="6 6" opacity=".55"/>`}
     ${routes.map(r => `<path d="${r.path}" fill="none" stroke="${RCOL[r.status]}" stroke-width="${sel === r.ship ? 4.5 : 2.5}" stroke-linejoin="round" stroke-linecap="round" opacity="${sel && sel !== r.ship ? .25 : .9}" data-route="${r.ship}" class="rpath"/>`).join('')}
-    ${Object.entries(CITY).map(([n, [x, y]]) => `<g><circle cx="${x}" cy="${y}" r="4" fill="#fff" stroke="#9a9aa2" stroke-width="1.5"/>${small ? '' : `<text x="${x + 8}" y="${y - 7}" class="city">${n}</text>`}</g>`).join('')}
+    ${Object.entries(CITY).map(([n, [x, y]]) => `<g><circle cx="${x}" cy="${y}" r="4" class="node" stroke-width="1.5"/>${small ? '' : `<text x="${x + 8}" y="${y - 7}" class="city">${n}</text>`}</g>`).join('')}
     ${routes.map(r => `<g class="truck" opacity="${sel && sel !== r.ship ? .35 : 1}"><circle r="${small ? 6 : 8}" fill="${RCOL[r.status]}" stroke="#fff" stroke-width="2.5">
       <animateMotion dur="${r.dur}s" repeatCount="indefinite" path="${r.path}" rotate="0"/></circle></g>`).join('')}
   </svg>`;
@@ -530,8 +496,8 @@ V.reports = () => {
 V.help = () => V.overview();
 
 // ================================================================ settings tabs
-const field = (label, value, type = 'text', hint = '') => `<label class="field"><span>${label}</span>${type === 'select'
-  ? `<select class="text">${value.map(v => `<option>${v}</option>`).join('')}</select>` : `<input class="text" type="${type}" value="${esc(value)}">`}${hint ? `<small>${hint}</small>` : ''}</label>`;
+const field = (label, value, type = 'text', hint = '') => UI.field(
+  type === 'select' ? { label, type, options: value, hint } : { label, type, value, hint });
 
 const TEAM = [
   ['you', 'alex@northline-logistics.com', 'Admin', 'All', 'Now'], ['james', 'james@northline-logistics.com', 'Dispatcher', 'Dispatch, routing', '2 min ago'],
@@ -600,15 +566,8 @@ window.SETTINGS_TABS = {
 };
 
 // ================================================================ drawer, palette, popovers
-function openDrawer(html) {
-  closeDrawer();
-  const s = document.createElement('div');
-  s.className = 'scrim drawer-scrim';
-  s.innerHTML = `<aside class="drawer" role="dialog" aria-modal="true">${html}</aside>`;
-  s.addEventListener('click', (e) => { if (e.target === s || e.target.closest('[data-close]')) closeDrawer(); });
-  document.body.appendChild(s);
-}
-function closeDrawer() { document.querySelector('.drawer-scrim')?.remove(); }
+const openDrawer = UI.drawer;
+const closeDrawer = UI.closeDrawer;
 
 function paletteItems() {
   const pages = [['Overview', '#/overview', 'grid'], ['AI agents', '#/agents', 'sparkles'], ['Approvals', '#/inbox', 'inbox'], ['Shipments', '#/shipments', 'box'], ['Dispatch board', '#/dispatch', 'send'], ['Live routes', '#/routes', 'route'], ['Exceptions', '#/exceptions', 'alert'], ['Customers', '#/customers', 'users'], ['Fleet', '#/fleet', 'truck'], ['Reports', '#/reports', 'chart'], ['Activity log', '#/activity', 'list'], ['Settings', '#/settings', 'settings']]
@@ -621,35 +580,13 @@ function paletteItems() {
   const agents = AGENTS.map(a => ({ t: a.name, i: a.ic, sub: 'Agent', go: () => (location.hash = '#/agents/' + a.id) }));
   const ships = SHIPMENTS.map(s => ({ t: `${s.id} · ${CUSTOMERS[s.cust].name}`, i: 'box', sub: `${s.from} → ${s.to}`, go: () => shipDrawer(s.id) }));
   const custs = CUSTOMERS.map(c => ({ t: c.name, i: 'users', sub: 'Customer', go: () => { location.hash = '#/customers'; setTimeout(() => custDrawer(c.i), 30); } }));
-  return [...acts, ...pages, ...agents, ...custs, ...ships];
+  return [...acts, ...pages, ...agents, ...custs, ...ships]
+    .map(x => ({ title: x.t, sub: x.sub, icon: x.i, run: x.go }));
 }
-window.openPalette = function () {
-  if (document.querySelector('.palette')) return;
-  closeDrawer(); closeModal();
-  const all = paletteItems(); let idx = 0, shown = [];
-  const s = document.createElement('div');
-  s.className = 'scrim palette-scrim';
-  s.innerHTML = `<div class="palette" role="dialog" aria-label="Command palette"><div class="pin">${icon('search', 16)}<input placeholder="Search pages, agents, shipments, customers…" aria-label="Search"><span class="kbd">esc</span></div><div class="pres"></div></div>`;
-  document.body.appendChild(s);
-  const input = s.querySelector('input'), res = s.querySelector('.pres');
-  const draw = () => {
-    const q = input.value.trim().toLowerCase();
-    shown = (q ? all.filter(x => (x.t + ' ' + x.sub).toLowerCase().includes(q)) : all.slice(0, 15)).slice(0, 30);
-    idx = Math.min(idx, Math.max(0, shown.length - 1));
-    res.innerHTML = shown.length ? shown.map((x, k) => `<button type="button" class="pi ${k === idx ? 'on' : ''}" data-k="${k}">${icon(x.i, 14)}<span class="grow">${esc(x.t)}</span><small>${esc(x.sub)}</small></button>`).join('') : '<div class="empty">No results</div>';
-    res.querySelector('.on')?.scrollIntoView({ block: 'nearest' });
-  };
-  const pick = (k) => { const x = shown[k]; s.remove(); x?.go(); };
-  input.addEventListener('input', () => { idx = 0; draw(); });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown') { idx = Math.min(idx + 1, shown.length - 1); draw(); e.preventDefault(); }
-    if (e.key === 'ArrowUp') { idx = Math.max(idx - 1, 0); draw(); e.preventDefault(); }
-    if (e.key === 'Enter') pick(idx);
-    if (e.key === 'Escape') s.remove();
-  });
-  s.addEventListener('click', (e) => { const b = e.target.closest('.pi'); if (b) pick(+b.dataset.k); else if (e.target === s) s.remove(); });
-  draw(); input.focus();
-};
+window.openPalette = () => UI.palette({
+  items: paletteItems,
+  placeholder: 'Search pages, agents, shipments, customers…',
+});
 
 function toggleNotifs(btn) {
   const ex = document.querySelector('.notifs'); if (ex) { ex.remove(); return; }
@@ -660,15 +597,9 @@ function toggleNotifs(btn) {
     ['customer', 'Raj Patel (Northline Foods) replied to a delay notice', '41 min ago', '#/customers'],
     ['ops', 'Daily ops one-pager is ready', '9:24', '#/reports'],
   ];
-  const p = document.createElement('div');
-  p.className = 'notifs';
-  p.innerHTML = `<div class="between nh"><b>Notifications</b><button class="link" type="button" data-act="notif-read">Mark all read</button></div>
+  UI.popover(btn, `<div class="between nh"><b>Notifications</b><button class="link" type="button" data-act="notif-read">Mark all read</button></div>
     ${items.map(([a, t, w, h], k) => `<a href="${h}" class="ni ${!ui.notifRead && k < 3 ? 'unread' : ''}"><span class="ic-sq sm">${icon(agentById(a).ic, 11, 2.2)}</span><div class="grow"><b>${t}</b><small>${w}</small></div></a>`).join('')}
-    <a class="nf" href="#/activity">Open activity log</a>`;
-  document.body.appendChild(p);
-  const r = btn.getBoundingClientRect();
-  p.style.top = r.bottom + 8 + 'px';
-  p.style.right = Math.max(12, innerWidth - r.right) + 'px';
+    <a class="nf" href="#/activity">Open activity log</a>`);
 }
 
 function helpModal() {
@@ -698,7 +629,6 @@ function assignShip(id) {
   s.driver = 0; s.status = 'assigned';
 }
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.notifs') && !e.target.closest('[data-act="notifs"]')) document.querySelector('.notifs')?.remove();
   const el = e.target.closest('[data-act]'); if (!el) return;
   const id = el.dataset.id;
   switch (el.dataset.act) {
@@ -768,22 +698,15 @@ document.addEventListener('input', (e) => {
   if (e.target.id === 'ov-reason') e.target.classList.remove('err');
 });
 
-// "g" then a letter jumps between screens.
-let gPending = 0;
-document.addEventListener('keydown', (e) => {
-  if (e.target.closest('input, textarea, select') || e.metaKey || e.ctrlKey) return;
-  if (e.key === 'Escape') { closeDrawer(); document.querySelector('.notifs')?.remove(); }
-  const k = e.key.toLowerCase();
-  if (gPending && Date.now() - gPending < 1200) {
-    const map = { o: 'overview', a: 'agents', i: 'inbox', s: 'shipments', d: 'dispatch', r: 'routes', e: 'exceptions', c: 'customers', f: 'fleet', l: 'activity' };
-    if (map[k]) location.hash = '#/' + map[k];
-    gPending = 0; return;
-  }
-  if (k === 'g') gPending = Date.now();
-  if (k === '?') helpModal();
+// "g" then a letter jumps between screens; the kit handles the sequencing.
+UI.shortcuts({
+  'mod+k': () => openPalette(),
+  '?': () => helpModal(),
+  ...Object.fromEntries(Object.entries({
+    o: 'overview', a: 'agents', i: 'inbox', s: 'shipments', d: 'dispatch',
+    r: 'routes', e: 'exceptions', c: 'customers', f: 'fleet', l: 'activity',
+  }).map(([k, route]) => [`g ${k}`, () => { location.hash = '#/' + route; }])),
 });
-
-window.addEventListener('hashchange', closeDrawer);
 
 // Drag and drop on the dispatch board.
 window.afterRender = (root) => {

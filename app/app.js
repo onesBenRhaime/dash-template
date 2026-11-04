@@ -1,62 +1,15 @@
 /* FleetFlow AI — product prototype.
    Vanilla JS, hash-routed, no build step. */
 
-// ---------------------------------------------------------------- icons
-const P = {
-  logo: '<path d="M5 19V9a4 4 0 0 1 4-4h10"/><path d="M9 19v-6a2 2 0 0 1 2-2h8"/><circle cx="17" cy="17" r="2"/>',
-  grid: '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
-  globe: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.5 2.5 2.5 13.5 0 16M12 4c-2.5 2.5-2.5 13.5 0 16"/>',
-  send: '<path d="M20 4 4 11l7 2 2 7 7-16Z"/>',
-  box: '<path d="M4 8 12 4l8 4v8l-8 4-8-4V8Z"/><path d="m4 8 8 4 8-4M12 12v8"/>',
-  route: '<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/>',
-  alert: '<path d="M12 4 2.5 20h19L12 4Z"/><path d="M12 10v4M12 17v.5"/>',
-  users: '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M21 20a6 6 0 0 0-4-5.6"/>',
-  truck: '<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
-  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
-  doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
-  spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
-  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
-  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/>',
-  chat: '<path d="M4 5h16v11H9l-5 4V5Z"/>',
-  bell: '<path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4l2-2Z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
-  search: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
-  pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
-  play: '<path d="M7 5v14l12-7L7 5Z"/>',
-  shield: '<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z"/>',
-  list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
-  check: '<path d="m5 12 4.5 4.5L19 7"/>',
-  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
-  x: '<path d="M6 6l12 12M18 6 6 18"/>',
-  back: '<path d="M15 6l-6 6 6 6"/>',
-  down: '<path d="m6 9 6 6 6-6"/>',
-  bolt: '<path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/>',
-  cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
-  db: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>',
-  wrench: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6 2.6-2.2Z"/>',
-  msg: '<path d="M21 12a8 8 0 0 1-11.8 7L4 20l1-5A8 8 0 1 1 21 12Z"/>',
-  ban: '<circle cx="12" cy="12" r="8"/><path d="m6.5 6.5 11 11"/>',
-  download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
-  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
-  building: '<path d="M4 20V5l8-2v17M12 8l8 2v10M2 20h20M7 8h2M7 12h2M7 16h2M15 13h2M15 16h2"/>',
-  key: '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/>',
-  card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>',
-  plug: '<path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0V8ZM12 17v4"/>',
-  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
-  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  inbox: '<path d="M4 13 6.5 5h11L20 13v6H4v-6Z"/><path d="M4 13h4.5l1 2h5l1-2H20"/>',
-  map: '<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2V6Z"/><path d="M9 4v14M15 6v14"/>',
-  plus: '<path d="M12 5v14M5 12h14"/>',
-  filter: '<path d="M4 5h16l-6 8v6l-4-1v-5L4 5Z"/>',
-  more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
-  pin: '<path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
-  fuel: '<path d="M4 20V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15M3 20h12M4 10h10M14 8l3 3v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>',
-  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
-  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
-  thermo: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0Z"/>',
-  sparkles: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3ZM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/>',
-};
-const icon = (n, s = 16, sw = 1.8) =>
-  `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
+// ---------------------------------------------------------------- kit
+// Everything generic (icons, overlays, charts, router) lives in ../ui/ui.js.
+// These aliases keep the view code below reading the way it always has.
+const { $, $$, esc, icon } = UI;
+const toast = UI.toast;
+const abar = UI.meter;
+const dots = UI.dots;
+const openModal = (html, onMount) => UI.modal(html, { onMount });
+const closeModal = UI.closeModal;
 
 // ---------------------------------------------------------------- data
 const LEVELS = ['Observe', 'Recommend', 'Draft', 'Approve first', 'Autonomous'];
@@ -237,29 +190,13 @@ const capsFor = (id) => {
 };
 
 // ---------------------------------------------------------------- helpers
-const $ = (s, el = document) => el.querySelector(s);
-const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const abar = (n) => `<div class="abar">${[0, 1, 2, 3, 4].map(i => `<i class="${i < n ? 'f' : ''}"></i>`).join('')}</div>`;
-const dots = (n) => `<span class="lvl-dots">${[0, 1, 2, 3, 4].map(i => `<i class="${i < n ? 'f' : ''}"></i>`).join('')}</span>`;
-const seg = (level, attrs) => `<div class="seg" ${attrs}>${LEVELS.map((l, i) =>
-  `<button type="button" data-l="${i}" class="${i === level ? 'on lvl-' + i : ''}">${i === 3 ? icon('lock', 11, 2.2) : ''}${l}</button>`).join('')}</div>`;
+const seg = (level, attrs) => UI.seg({ options: LEVELS, value: level, attrs, lock: [3] });
 
 function statusPill(a) {
   if (state.paused || !state.agentOn[a.id]) return '<span class="pill gray">Paused</span>';
   if (a.status === 'needs') return `<span class="pill amber">Needs you · ${a.needs}</span>`;
   if (a.status === 'active') return '<span class="pill green">Active</span>';
   return '<span class="pill gray">Idle</span>';
-}
-
-function toast(msg, undo) {
-  $('.toast')?.remove();
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.innerHTML = `<span class="ok">${icon('check', 12, 3)}</span>${esc(msg)}${undo ? '<button type="button">Undo</button>' : ''}`;
-  document.body.appendChild(t);
-  if (undo) t.querySelector('button').onclick = () => { undo(); t.remove(); };
-  setTimeout(() => t.remove(), 3600);
 }
 
 // ---------------------------------------------------------------- chrome
@@ -281,34 +218,26 @@ function rail(route) {
     ['#/reports', 'chart', 'Reports', route === 'reports', 'hide-sm'],
     ['#/activity', 'list', 'Activity log', route === 'activity', 'hide-sm'],
   ];
-  const link = ([h, ic, label, on, cls = '', badge]) =>
-    `<a href="${h}" class="${on ? 'on' : ''} ${cls}" title="${label}" aria-label="${label}">${icon(ic, 18)}${badge ? `<span class="dot">${badge}</span>` : ''}</a>`;
-  return `<nav class="rail">
-    <a href="../" class="logo" title="FleetFlow AI home" aria-label="FleetFlow AI home">${icon('logo', 18, 2.2)}</a>
-    ${items.map(link).join('')}
-    <div class="sep"></div>
-    ${items2.map(link).join('')}
-    <div class="spacer"></div>
-    ${link(['#/settings', 'settings', 'Settings', route === 'settings'])}
-    <a href="#" data-act="help" class="hide-sm" title="Help & shortcuts" aria-label="Help">${icon('help', 18)}</a>
-    <span class="avatar" style="background:${PEOPLE.you.c}" title="${PEOPLE.you.name}">${PEOPLE.you.i}</span>
-  </nav>`;
+  const toItem = ([href, ic, label, on, className = '', badge]) => ({ href, icon: ic, label, active: on, className, badge });
+  return UI.rail({
+    logo: { href: '../', icon: 'logo', label: 'FleetFlow AI home' },
+    items: [...items.map(toItem), { sep: true }, ...items2.map(toItem), { spacer: true }],
+    footer: [
+      toItem(['#/settings', 'settings', 'Settings', route === 'settings']),
+      { href: '#', icon: 'help', label: 'Help & shortcuts', className: 'hide-sm', attrs: { 'data-act': 'help' } },
+    ],
+    avatar: UI.avatar({ name: PEOPLE.you.name, initials: PEOPLE.you.i, color: PEOPLE.you.c }),
+  });
 }
 
 function topbar({ crumb, title, back, actions }) {
-  return `<header class="top">
-    <div>
-      <div class="crumb">${crumb}</div>
-      <h1 class="title">${back ? `<a class="back" href="${back}" aria-label="Back">${icon('back', 18)}</a>` : ''}${title}</h1>
-    </div>
-    <div class="actions">${actions}
-      <button class="icon-btn" type="button" data-act="notifs" aria-label="Notifications">${icon('bell', 18)}<span class="ping"></span></button>
-    </div>
-  </header>`;
+  return UI.topbar({
+    crumb, title, back,
+    actions: (actions || '') +
+      UI.iconBtn({ icon: 'bell', label: 'Notifications', dot: true, attrs: { 'data-act': 'notifs', 'data-popover': true } }),
+  });
 }
-const searchBox = (ph = 'Search shipments, drivers…', id = '') => !id
-  ? `<button type="button" class="search" data-act="palette">${icon('search', 14)}<span style="flex:1;text-align:left;font-size:12px">${ph}</span><span class="kbd">⌘K</span></button>`
-  : `<label class="search">${icon('search', 14)}<input ${id ? `id="${id}"` : ''} placeholder="${ph}" aria-label="Search"><span class="kbd">⌘K</span></label>`;
+const searchBox = (ph = 'Search shipments, drivers…', id = '') => UI.search({ placeholder: ph, id, label: 'Search' });
 const pauseBtn = () => state.paused
   ? `<button class="btn accent" type="button" data-act="resume">${icon('play', 13, 2.2)}Resume agents</button>`
   : `<button class="btn dark" type="button" data-act="pause">${icon('pause', 13, 2.2)}Pause all agents</button>`;
@@ -553,18 +482,6 @@ function viewActivity() {
 }
 
 // ---------------------------------------------------------------- modals
-function openModal(html, onMount) {
-  closeModal();
-  const s = document.createElement('div');
-  s.className = 'scrim';
-  s.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${html}</div>`;
-  s.addEventListener('click', (e) => { if (e.target === s || e.target.closest('[data-close]')) closeModal(); });
-  document.body.appendChild(s);
-  onMount?.(s);
-  s.querySelector('button, textarea')?.focus();
-}
-function closeModal() { $('.scrim')?.remove(); }
-
 function sandboxModal(id) {
   const a = agentById(id);
   const changed = capsFor(id).filter(c => c.level !== c.orig).length;
@@ -616,43 +533,32 @@ function pauseModal() {
 }
 
 // ---------------------------------------------------------------- router
-function route() {
-  const h = location.hash.replace(/^#\/?/, '') || 'overview';
-  const [root, sub] = h.split('/');
-  let html;
-  if (root === 'agents' && sub) html = viewAgent(sub);
-  else if (root === 'agents') html = viewAgents();
-  else if (root === 'settings') html = viewSettings(sub || 'ai');
-  else if (root === 'activity') html = viewActivity();
-  else if (window.VIEWS?.[root]) html = VIEWS[root](sub);
-  else html = VIEWS.overview();
-  const app = $('#app');
-  app.innerHTML = `<div class="shell">${rail(root === 'agents' && sub ? 'agents-detail' : root)}<main class="main"><div class="view">${html}</div></main></div>`;
-  mountChart();
-  window.afterRender?.(root, sub);
-}
-
-function rerender() {
-  const y = window.scrollY;
-  route();
-  window.scrollTo(0, y);
-}
+const appRouter = UI.router({
+  mount: '#app',
+  fallback: 'overview',
+  resolve(root, sub) {
+    if (root === 'agents' && sub) return viewAgent(sub);
+    if (root === 'agents') return viewAgents();
+    if (root === 'settings') return viewSettings(sub || 'ai');
+    if (root === 'activity') return viewActivity();
+    return (window.VIEWS?.[root] || VIEWS.overview)(sub);
+  },
+  chrome: (html, root, sub) => UI.shell({ rail: rail(root === 'agents' && sub ? 'agents-detail' : root), main: html }),
+  after(root, sub) {
+    mountChart();
+    window.afterRender?.(root, sub);
+  },
+});
+const route = appRouter.render;
+const rerender = appRouter.rerender;
 
 function mountChart() {
   const chart = $('#chart'); if (!chart) return;
-  const id = location.hash.split('/')[2];
-  const data = chartData(id.length * 97);
-  const tip = $('#tip');
-  chart.addEventListener('mousemove', (e) => {
-    const bar = e.target.closest('.bar'); if (!bar) return;
-    const d = data[+bar.dataset.i];
-    const r = chart.getBoundingClientRect(), b = bar.getBoundingClientRect();
-    tip.innerHTML = `<div style="margin-bottom:4px;font-weight:600">${d.day.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-      <div class="between"><span>Automatic</span><b>${d.auto}</b></div><div class="between"><span>Needed approval</span><b>${d.ap}</b></div>`;
-    tip.style.left = Math.min(Math.max(b.left - r.left + b.width / 2, 75), r.width - 75) + 'px';
-    tip.classList.add('show');
+  UI.barChart(chart, chartData(location.hash.split('/')[2].length * 97), {
+    series: [{ key: 'auto' }, { key: 'ap', className: 'ap' }],
+    label: (d) => `<div style="margin-bottom:4px;font-weight:600">${d.day.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+      <div class="between"><span>Automatic</span><b>${d.auto}</b></div><div class="between"><span>Needed approval</span><b>${d.ap}</b></div>`,
   });
-  chart.addEventListener('mouseleave', () => tip.classList.remove('show'));
 }
 
 // ---------------------------------------------------------------- events
@@ -704,9 +610,7 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
   if (e.key === 'Enter' && e.target.matches('[data-go]')) location.hash = e.target.dataset.go;
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); window.openPalette?.(); }
 });
 
 document.addEventListener('change', (e) => {
@@ -722,17 +626,14 @@ function refreshLog() {
 }
 
 function exportCSV() {
-  const head = ['time', 'agent', 'action', 'reference', 'reason', 'approval', 'result'];
-  const rows = filteredLog().map(r => [r[0], agentById(r[1]).name, r[2], r[3], r[4], r[5][0] === 'auto' ? r[5][1] : `${r[5][0]}:${PEOPLE[r[5][1]].name}`, r[6][1]]);
-  const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-  const link = Object.assign(document.createElement('a'), { href: url, download: 'fleetflow-activity-log.csv' });
-  document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
-  toast(`Exported ${rows.length} rows`);
+  const rows = filteredLog().map(r => [r[0], agentById(r[1]).name, r[2], r[3], r[4],
+    r[5][0] === 'auto' ? r[5][1] : `${r[5][0]}:${PEOPLE[r[5][1]].name}`, r[6][1]]);
+  const n = UI.downloadCSV('fleetflow-activity-log.csv',
+    ['time', 'agent', 'action', 'reference', 'reason', 'approval', 'result'], rows);
+  toast(`Exported ${n} rows`);
 }
 
 // Embedded mode (marketing page iframe): ?embed=1 hides nothing but disables framing padding
 if (!new URLSearchParams(location.search).has('embed')) document.body.classList.add('framed');
-window.addEventListener('hashchange', () => { closeModal(); route(); window.scrollTo(0, 0); });
 // views.js registers the remaining screens; render once every script has run.
 document.addEventListener('DOMContentLoaded', route);

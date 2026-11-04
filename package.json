@@ -1,0 +1,39 @@
+{
+  "name": "dash-ui",
+  "version": "1.0.0",
+  "description": "A dependency-free dashboard UI kit: tokens, components, overlays, charts, router and keyboard shortcuts in one stylesheet and one script.",
+  "main": "ui/ui.js",
+  "module": "ui/ui.mjs",
+  "style": "ui/ui.css",
+  "exports": {
+    ".": {
+      "import": "./ui/ui.mjs",
+      "require": "./ui/ui.js"
+    },
+    "./ui.css": "./ui/ui.css"
+  },
+  "files": [
+    "ui/ui.js",
+    "ui/ui.mjs",
+    "ui/ui.css",
+    "ui/README.md"
+  ],
+  "sideEffects": [
+    "ui/ui.js",
+    "ui/ui.mjs",
+    "*.css"
+  ],
+  "scripts": {
+    "start": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "dashboard",
+    "ui-kit",
+    "css",
+    "design-tokens",
+    "components",
+    "no-build",
+    "vanilla-js"
+  ],
+  "private": true
+}
